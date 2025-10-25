@@ -1,0 +1,70 @@
+package com.zhytelnyi.online_radio_server.model;
+import jakarta.persistence.*;
+import java.util.Set;
+@Entity
+@Table(name = "tracks")
+public class Track {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String title;
+
+    private String artist;
+
+    @Column(nullable = false, unique = true)
+    private String filePath;
+
+    @ManyToMany(mappedBy = "tracks")
+    private Set<Playlist> playlists = new HashSet<>();
+
+    public Track() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public Set<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(Set<Playlist> playlists) {
+        this.playlists = playlists;
+    }
+
+    public Track(String title, String artist, String filePath){
+        this.title = title;
+        this.artist = artist;
+        this.filePath = filePath;
+    }
+}
