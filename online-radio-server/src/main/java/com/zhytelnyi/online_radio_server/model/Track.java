@@ -1,5 +1,7 @@
 package com.zhytelnyi.online_radio_server.model;
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.Set;
 @Entity
 @Table(name = "tracks")
@@ -11,6 +13,9 @@ public class Track {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
+    private int durationInSeconds;
+
     private String artist;
 
     @Column(nullable = false, unique = true)
@@ -20,6 +25,13 @@ public class Track {
     private Set<Playlist> playlists = new HashSet<>();
 
     public Track() {
+    }
+
+    public Track(String title, String artist, String filePath, int durationInSeconds){
+        this.title = title;
+        this.artist = artist;
+        this.filePath = filePath;
+        this.durationInSeconds = durationInSeconds;
     }
 
     public Long getId() {
@@ -62,9 +74,11 @@ public class Track {
         this.playlists = playlists;
     }
 
-    public Track(String title, String artist, String filePath){
-        this.title = title;
-        this.artist = artist;
-        this.filePath = filePath;
+    public int getDurationInSeconds() {
+        return durationInSeconds;
+    }
+
+    public void setDurationInSeconds(int durationInSeconds) {
+        this.durationInSeconds = durationInSeconds;
     }
 }

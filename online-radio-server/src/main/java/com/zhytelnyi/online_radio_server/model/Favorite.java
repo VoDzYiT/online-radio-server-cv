@@ -10,14 +10,20 @@ public class Favorite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany @JoinColumn(name = "user_id")
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne @JoinColumn(name = "station_id")
+    @ManyToOne
+    @JoinColumn(name = "station_id")
     private Station station;
 
     public Favorite(User user, Station station) {
         this.user = user;
         this.station = station;
+    }
+
+    public Favorite() {
+
     }
 }

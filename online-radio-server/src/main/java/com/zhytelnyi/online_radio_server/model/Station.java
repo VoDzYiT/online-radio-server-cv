@@ -1,6 +1,8 @@
 package com.zhytelnyi.online_radio_server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zhytelnyi.online_radio_server.service.visitor.Element;
+import com.zhytelnyi.online_radio_server.service.visitor.Visitor;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -14,8 +16,8 @@ public class Station implements Element {
     private Long Id;
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "station_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Playlist> playlists;
 
     public void addPlayList(Playlist p) {}
