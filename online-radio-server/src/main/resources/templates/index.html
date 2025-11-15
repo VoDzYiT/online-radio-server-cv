@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,22 +8,41 @@
 </head>
 <body>
 <h1>Online Radio</h1>
+<select id="station-select">
+    <option value="1">Classic Rock</option>
+    <option value="2">Classic FM</option>
+</select>
 
+<audio id="radio-player" controls></audio>
 <script>
-    var video = document.getElementById('radio-player');
-    var hlsUrl = '/hls/1/stream.m3u8';
+    var audio = document.getElementById('radio-player');
+    var select = document.getElementById('station-select');
 
-    if (Hls.isSupported()) {
-        var hls = new Hls({
-            liveSyncDurationCount: 2,
-            liveMaxLatencyDurationCount: 4
-        });
-        hls.loadSource(hlsUrl);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-            video.play();
-        });
+    function loadStation(stationId) {
+        var hlsUrl = '/hls/' + stationId + '/stream.m3u8';
+
+        if (Hls.isSupported()) {
+            var hls = new Hls({
+                liveSyncDurationCount: 2,
+                liveMaxLatencyDurationCount: 4
+            });
+            hls.loadSource(hlsUrl);
+            hls.attachMedia(audio);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                audio.play();
+            });
+        } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+            audio.src = hlsUrl;
+            audio.play();
+        }
     }
+
+    loadStation(select.value);
+
+    select.addEventListener('change', function() {
+        loadStation(this.value);
+    });
 </script>
 </body>
+
 </html>
