@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My HLS Radio</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+<h1>Online Radio</h1>
+
+<script>
+    var video = document.getElementById('radio-player');
+    var hlsUrl = '/hls/1/stream.m3u8';
+
+    if (Hls.isSupported()) {
+        var hls = new Hls({
+            liveSyncDurationCount: 2,
+            liveMaxLatencyDurationCount: 4
+        });
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play();
+        });
+    }
+</script>
+</body>
+</html>
