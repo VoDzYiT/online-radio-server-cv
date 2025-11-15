@@ -7,6 +7,7 @@ import com.zhytelnyi.online_radio_server.model.Track;
 import com.zhytelnyi.online_radio_server.repository.StationRepository;
 import com.zhytelnyi.online_radio_server.service.iterator.TrackCollection;
 import com.zhytelnyi.online_radio_server.service.iterator.TrackIterator;
+import com.zhytelnyi.online_radio_server.service.factory.AudioFileFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -34,6 +35,7 @@ public class RadioServer {
 
     @Autowired private StationRepository stationRepository;
     @Autowired private StatisticsService statisticsService;
+    @Autowired private AudioFileFactory audioFileFactory;
 
     private final Map<Long, Station> activeStations = new ConcurrentHashMap<>();
     private final Map<Long, Track> currentTrack = new ConcurrentHashMap<>();
@@ -61,7 +63,7 @@ public class RadioServer {
     public void startChunking(Station station) {
 
         final Long stationId = station.getId();
-
+        final int stationBitrate = station.getBitrate();
         Path stationHlsPath = HLS_BASE_PATH.resolve(String.valueOf(stationId));
         try {
             Files.createDirectories(stationHlsPath);
@@ -84,7 +86,7 @@ public class RadioServer {
                     Track track = trackIterator.next();
                     System.out.println("[" + station.getName() + "] Processing: " + track.getTitle());
 
-                    File trackFile = new File(track.getFilePath());
+                    File trackFile = audioFileFactory.getAudioFile(track, stationBitrate);
 
                     if (!trackFile.exists()) {
                         System.err.println("File not found: " + track.getFilePath());

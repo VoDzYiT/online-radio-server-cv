@@ -20,6 +20,17 @@ public class Station implements Element {
     @JsonIgnore
     private List<Playlist> playlists;
 
+    public int getBitrate() {
+        return bitrate;
+    }
+
+    public void setBitrate(int bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    @Column(nullable = false)
+    private int bitrate = 128;
+
     public void addPlayList(Playlist p) {}
     public void removePlayList(Playlist p) {}
 

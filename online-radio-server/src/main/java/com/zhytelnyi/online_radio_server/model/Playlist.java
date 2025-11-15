@@ -17,7 +17,7 @@ public class Playlist implements TrackCollection {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name = "playlist_tracks",
             joinColumns = @JoinColumn(name = "playlist_id"),

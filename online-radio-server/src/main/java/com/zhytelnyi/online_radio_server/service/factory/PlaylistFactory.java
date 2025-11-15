@@ -5,7 +5,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PlaylistFactory {
+
     public Playlist createPlaylist(String name) {
-        return new Playlist(name);
+        Playlist playlist = new Playlist();
+        playlist.setName(name);
+        return playlist;
     }
 }
