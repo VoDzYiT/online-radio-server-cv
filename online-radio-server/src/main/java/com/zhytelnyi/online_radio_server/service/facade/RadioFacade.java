@@ -5,6 +5,7 @@ import com.zhytelnyi.online_radio_server.repository.FavoriteRepository;
 import com.zhytelnyi.online_radio_server.repository.RecordingRepository;
 import com.zhytelnyi.online_radio_server.repository.StationRepository;
 import com.zhytelnyi.online_radio_server.service.RadioServer;
+import com.zhytelnyi.online_radio_server.service.visitor.ContentStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -41,6 +42,19 @@ public class RadioFacade {
 
     public void stopRecording(User user, Recording recording) {
         System.out.println("User " + user.getUsername() + " stopped recording.");
+    }
+
+    public Mono<String> getStationReport(Long stationId) {
+        return Mono.fromCallable(() -> {
+            Station station = stationRepository.findById(stationId).orElse(null);
+            if (station == null) return "Station not found";
+
+            ContentStatistics visitor = new ContentStatistics();
+
+            station.accept(visitor);
+
+            return visitor.getReport();
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
 

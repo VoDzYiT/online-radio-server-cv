@@ -1,11 +1,13 @@
 package com.zhytelnyi.online_radio_server.model;
+import com.zhytelnyi.online_radio_server.service.visitor.Element;
+import com.zhytelnyi.online_radio_server.service.visitor.Visitor;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
 @Entity
 @Table(name = "tracks")
-public class Track {
+public class Track implements Element {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -80,5 +82,9 @@ public class Track {
 
     public void setDurationInSeconds(int durationInSeconds) {
         this.durationInSeconds = durationInSeconds;
+    }
+
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
     }
 }

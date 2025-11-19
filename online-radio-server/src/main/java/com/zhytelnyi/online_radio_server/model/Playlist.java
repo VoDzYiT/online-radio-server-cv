@@ -1,6 +1,8 @@
 package com.zhytelnyi.online_radio_server.model;
 import com.zhytelnyi.online_radio_server.service.iterator.TrackCollection;
 import com.zhytelnyi.online_radio_server.service.iterator.TrackIterator;
+import com.zhytelnyi.online_radio_server.service.visitor.Element;
+import com.zhytelnyi.online_radio_server.service.visitor.Visitor;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,7 +11,7 @@ import java.util.NoSuchElementException;
 
 @Entity
 @Table(name = "playlists")
-public class Playlist implements TrackCollection {
+public class Playlist implements TrackCollection, Element {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -73,7 +75,17 @@ public class Playlist implements TrackCollection {
         return new PlaylistIterator(this);
     }
 
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+
+        if (tracks != null) {
+            for (Track track : tracks) {
+                track.accept(visitor);
+            }
+        }
+    }
     private class PlaylistIterator implements TrackIterator {
+
         private List<Track> tracksToIterate;
         private int currentIndex = 0;
 

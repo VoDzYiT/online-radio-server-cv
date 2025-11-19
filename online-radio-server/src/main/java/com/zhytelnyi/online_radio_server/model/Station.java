@@ -36,7 +36,13 @@ public class Station implements Element {
 
     @Override
     public void accept(Visitor visitor) {
+        visitor.visit(this);
 
+        if (playlists != null) {
+            for (Playlist playlist : playlists) {
+                playlist.accept(visitor);
+            }
+        }
     }
 
     public Long getId() {

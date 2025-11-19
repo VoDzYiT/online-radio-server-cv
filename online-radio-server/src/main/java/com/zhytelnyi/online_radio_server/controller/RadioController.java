@@ -94,4 +94,10 @@ public class RadioController {
         return ResponseEntity.ok("Added to favorites");
     }
 
+    @GetMapping("/api/v1/station/{id}/report")
+    @ResponseBody
+    public Mono<String> getStationReport(@PathVariable Long id) {
+        return radioFacade.getStationReport(id);
+    }
+
 }
