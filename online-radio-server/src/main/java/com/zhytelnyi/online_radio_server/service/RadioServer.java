@@ -1,9 +1,11 @@
 package com.zhytelnyi.online_radio_server.service;
 
 import com.mpatric.mp3agic.Mp3File;
+import com.zhytelnyi.online_radio_server.model.ListenLog;
 import com.zhytelnyi.online_radio_server.model.Playlist;
 import com.zhytelnyi.online_radio_server.model.Station;
 import com.zhytelnyi.online_radio_server.model.Track;
+import com.zhytelnyi.online_radio_server.repository.ListenLogRepository;
 import com.zhytelnyi.online_radio_server.repository.StationRepository;
 import com.zhytelnyi.online_radio_server.service.iterator.TrackCollection;
 import com.zhytelnyi.online_radio_server.service.iterator.TrackIterator;
@@ -36,7 +38,7 @@ public class RadioServer {
     @Autowired private StationRepository stationRepository;
     @Autowired private StatisticsService statisticsService;
     @Autowired private AudioFileFactory audioFileFactory;
-
+    @Autowired private ListenLogRepository listenLogRepository;
     private final Map<Long, Station> activeStations = new ConcurrentHashMap<>();
     private final Map<Long, Track> currentTrack = new ConcurrentHashMap<>();
 
@@ -79,12 +81,20 @@ public class RadioServer {
             try {
                 int chunkCounter = 0;
                 LinkedList<String> manifestChunks = new LinkedList<>();
-
                 TrackIterator trackIterator = station.getPlaylists().get(0).createIterator();
+
 
                 while (true) {
                     Track track = trackIterator.next();
                     System.out.println("[" + station.getName() + "] Processing: " + track.getTitle());
+
+
+                    try {
+                        ListenLog log = new ListenLog(track, station);
+                        listenLogRepository.save(log);
+                    } catch (Exception e) {
+                        System.err.println("Statistics Error: Could not save log: " + e.getMessage());
+                    }
 
                     File trackFile = audioFileFactory.getAudioFile(track, stationBitrate);
 
