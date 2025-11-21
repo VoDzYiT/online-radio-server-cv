@@ -5,8 +5,10 @@ import com.zhytelnyi.online_radio_server.repository.FavoriteRepository;
 import com.zhytelnyi.online_radio_server.repository.RecordingRepository;
 import com.zhytelnyi.online_radio_server.repository.StationRepository;
 import com.zhytelnyi.online_radio_server.service.RadioServer;
+import com.zhytelnyi.online_radio_server.service.adapter.IReportExporter;
 import com.zhytelnyi.online_radio_server.service.visitor.ContentStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -20,6 +22,9 @@ public class RadioFacade {
     @Autowired private FavoriteRepository favoriteRepository;
     @Autowired private RecordingRepository recordingRepository;
     @Autowired private StationRepository stationRepository;
+    @Autowired
+    @Qualifier("jsonExporter")
+    private IReportExporter reportExporter;
 
 
 
@@ -47,13 +52,10 @@ public class RadioFacade {
     public Mono<String> getStationReport(Long stationId) {
         return Mono.fromCallable(() -> {
             Station station = stationRepository.findById(stationId).orElse(null);
-            if (station == null) return "Station not found";
+            if (station == null) return "{ \"error\": \"Not Found\" }";
 
-            ContentStatistics visitor = new ContentStatistics();
+            return reportExporter.export(station);
 
-            station.accept(visitor);
-
-            return visitor.getReport();
         }).subscribeOn(Schedulers.boundedElastic());
     }
 

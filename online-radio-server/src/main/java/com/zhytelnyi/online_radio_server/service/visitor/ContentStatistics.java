@@ -7,15 +7,16 @@ import com.zhytelnyi.online_radio_server.model.User;
 
 public class ContentStatistics implements Visitor{
 
+
+
     private int totalTracks = 0;
     private long totalDurationSeconds = 0;
     private int playlistCount = 0;
-    private StringBuilder reportBuilder = new StringBuilder();
+    private String stationName = "";
 
     @Override
     public void visit(Station station) {
-        reportBuilder.append("Report for Station: ").append(station.getName()).append("\n");
-        reportBuilder.append("Bitrate: ").append(station.getBitrate()).append("kbps\n");
+        this.stationName = station.getName();
     }
 
     @Override
@@ -34,16 +35,32 @@ public class ContentStatistics implements Visitor{
         playlistCount++;
     }
 
-    public String getReport() {
-        reportBuilder.append("----------------------------\n");
-        reportBuilder.append("Total Playlists: ").append(playlistCount).append("\n");
-        reportBuilder.append("Total Tracks: ").append(totalTracks).append("\n");
+//    public String getReport() {
+//        reportBuilder.append("----------------------------\n");
+//        reportBuilder.append("Total Playlists: ").append(playlistCount).append("\n");
+//        reportBuilder.append("Total Tracks: ").append(totalTracks).append("\n");
+//
+//        long hours = totalDurationSeconds / 3600;
+//        long minutes = (totalDurationSeconds % 3600) / 60;
+//        reportBuilder.append("Total Content Duration: ")
+//                .append(hours).append("h ").append(minutes).append("m\n");
+//
+//        return reportBuilder.toString();
+//    }
 
-        long hours = totalDurationSeconds / 3600;
-        long minutes = (totalDurationSeconds % 3600) / 60;
-        reportBuilder.append("Total Content Duration: ")
-                .append(hours).append("h ").append(minutes).append("m\n");
+    public int getTotalTracks() {
+        return totalTracks;
+    }
 
-        return reportBuilder.toString();
+    public long getTotalDurationSeconds() {
+        return totalDurationSeconds;
+    }
+
+    public int getPlaylistCount() {
+        return playlistCount;
+    }
+
+    public String getStationName() {
+        return stationName;
     }
 }
