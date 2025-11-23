@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Мої улюблені станції</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .station-card {
+      border: 1px solid #ddd; padding: 15px; margin-bottom: 10px;
+      border-radius: 5px; background: #f9f9f9;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .station-card h3 { margin: 0; }
+    .btn { text-decoration: none; padding: 8px 15px; background: #007bff; color: white; border-radius: 4px; }
+    .back-link { display: block; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+<a href="/" class="back-link">← На головну</a>
+
+<h1>Мої улюблені радіостанції ❤️</h1>
+
+<div th:if="${favoriteStations.empty}">
+  <p>У вас поки немає улюблених станцій. Додайте їх на головній!</p>
+</div>
+
+<div th:each="station : ${favoriteStations}" class="station-card">
+  <div>
+    <h3 th:text="${station.name}">Назва станції</h3>
+    <span style="color: gray;" th:text="'Бітрейт: ' + ${station.bitrate} + ' kbps'">128 kbps</span>
+  </div>
+
+  <a th:href="@{/(play=${station.id})}" class="btn">Слухати ▶</a>
+</div>
+
+</body>
+</html>

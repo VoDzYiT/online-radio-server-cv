@@ -4,11 +4,16 @@ import com.zhytelnyi.online_radio_server.service.visitor.Element;
 import com.zhytelnyi.online_radio_server.service.visitor.Visitor;
 import jakarta.persistence.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users")
-public class User implements Element {
+public class User implements Element, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +31,27 @@ public class User implements Element {
     @OneToMany(mappedBy = "user")
     private Set<Recording> recording;
 
+    public User() {}
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
+    }
+
+    @Override public String getPassword() { return password; }
+    @Override public String getUsername() { return username; }
+
+    // Для простоти все true
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
+
     public Long getId() {
         return id;
     }
@@ -34,16 +60,9 @@ public class User implements Element {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {

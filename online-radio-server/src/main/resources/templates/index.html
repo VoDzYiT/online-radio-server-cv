@@ -1,35 +1,99 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>My HLS Radio</title>
+    <title>Online Radio</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <style>
+        .container { padding: 20px; }
+        .player-controls { margin-top: 20px; }
+        .btn-fav { margin-left: 10px; cursor: pointer; padding: 5px 10px; }
+        /* Стиль для посилань у хедері */
+        a { text-decoration: none; color: #0056b3; }
+        a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-<h1>Online Radio</h1>
-<select id="station-select">
-    <option value="1">Classic Rock</option>
-    <option value="2">Classic FM</option>
-</select>
 
-<audio id="radio-player" controls></audio>
+<div style="background:#eee; padding:10px; display:flex; justify-content:space-between; align-items: center;">
+    <b>Radio App</b>
+
+    <div th:if="${isLoggedIn}">
+        Привіт, <span th:text="${username}" style="font-weight:bold">User</span>!
+
+        | <a href="/favorites">❤️ Мої станції</a> |
+
+        <span th:if="${isAdmin}"><a href="/admin" style="color: red;">[ADMIN]</a></span>
+
+        <form th:action="@{/logout}" method="post" style="display:inline; margin-left: 10px;">
+            <button type="submit">Вийти</button>
+        </form>
+    </div>
+
+    <div th:unless="${isLoggedIn}">
+        <a href="/login">Вхід</a> | <a href="/register">Реєстрація</a>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Online Radio</h1>
+
+    <div class="player-controls">
+        <label for="station-select">Оберіть станцію:</label>
+        <select id="station-select">
+            <option value="1">Classic Rock</option>
+            <option value="2">Classic FM</option>
+        </select>
+
+        <button class="btn-fav" onclick="addToFavorites()">
+            ❤️ В улюблені
+        </button>
+
+        <br><br>
+        <audio id="radio-player" controls style="width: 300px;"></audio>
+    </div>
+</div>
+
 <script>
     var audio = document.getElementById('radio-player');
     var select = document.getElementById('station-select');
+    var hls = null;
 
+    // --- 1. Функція додавання в улюблені ---
+    function addToFavorites() {
+        var stationId = select.value;
+        fetch('/api/v1/favorites?stationId=' + stationId, { method: 'POST' })
+            .then(async response => {
+                if (response.ok) {
+                    let text = await response.text();
+                    alert(text);
+                } else if (response.status === 401) {
+                    window.location.href = "/login";
+                } else {
+                    alert('Error adding to favorites');
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+    // --- 2. Логіка завантаження станції (HLS) ---
     function loadStation(stationId) {
         var hlsUrl = '/hls/' + stationId + '/stream.m3u8';
 
+        if (hls) {
+            hls.destroy(); // Очистка старого потоку
+        }
+
         if (Hls.isSupported()) {
-            var hls = new Hls({
-                liveSyncDurationCount: 2,
-                liveMaxLatencyDurationCount: 4
-            });
+            hls = new Hls({ liveSyncDurationCount: 2, liveMaxLatencyDurationCount: 4 });
             hls.loadSource(hlsUrl);
             hls.attachMedia(audio);
             hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                audio.play();
+                var playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => console.log("Autoplay prevented: " + error));
+                }
             });
         } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
             audio.src = hlsUrl;
@@ -37,12 +101,38 @@
         }
     }
 
-    loadStation(select.value);
-
+    // Обробка ручного перемикання станції
     select.addEventListener('change', function() {
         loadStation(this.value);
     });
-</script>
-</body>
 
+    // --- 3. Обробка старту сторінки (оновлено) ---
+    window.onload = function() {
+        // Перевіряємо, чи є параметр ?play=ID в URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const playId = urlParams.get('play');
+
+        if (playId) {
+            // Перевіряємо, чи існує така опція в select (щоб уникнути помилок)
+            let optionExists = [...select.options].some(o => o.value == playId);
+
+            if (optionExists) {
+                select.value = playId;
+                loadStation(playId);
+
+                // Очищуємо URL (прибираємо ?play=...), щоб було красиво
+                // Використовуємо window.location.pathname, щоб залишити чистий шлях
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                // Якщо ID з URL невірний, граємо стандартну
+                if(select.value) loadStation(select.value);
+            }
+        } else {
+            // Якщо немає параметра, граємо першу зі списку
+            if(select.value) loadStation(select.value);
+        }
+    };
+</script>
+
+</body>
 </html>

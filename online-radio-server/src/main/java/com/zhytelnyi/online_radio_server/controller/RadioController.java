@@ -12,10 +12,12 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -85,13 +87,19 @@ public class RadioController {
                 .body(resource));
     }
 
-    @PostMapping("/favorites")
-    public ResponseEntity<String> addToFavorites(
-            @RequestParam Long userId,
-            @RequestParam Long stationId) {
+    @PostMapping("/api/v1/favorites")
+    public Mono<ResponseEntity<String>> addToFavorites(
+            @RequestParam Long stationId,
+            @AuthenticationPrincipal UserDetails userDetails // <-- Ось тут Spring дасть нам юзера
+    ) {
+        // Якщо користувач не залогінений, userDetails буде null
+        if (userDetails == null) {
+            return Mono.just(ResponseEntity.status(401).body("You must contain login first"));
+        }
 
-        System.out.println("Adding station " + stationId + " to favorites for user " + userId);
-        return ResponseEntity.ok("Added to favorites");
+        return radioFacade.addStationToFavorites(userDetails.getUsername(), stationId)
+                .map(message -> ResponseEntity.ok(message))
+                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().body(e.getMessage())));
     }
 
     @GetMapping("/api/v1/station/{id}/report")

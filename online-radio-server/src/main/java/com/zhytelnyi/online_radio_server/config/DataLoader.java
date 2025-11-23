@@ -4,13 +4,16 @@ import com.zhytelnyi.online_radio_server.model.Playlist;
 import com.zhytelnyi.online_radio_server.model.Station;
 import com.zhytelnyi.online_radio_server.model.Track;
 //import com.zhytelnyi.online_radio_server.repository.PlaylistRepository;
+import com.zhytelnyi.online_radio_server.model.User;
 import com.zhytelnyi.online_radio_server.repository.StationRepository;
 //import com.zhytelnyi.online_radio_server.repository.TrackRepository;
 import com.zhytelnyi.online_radio_server.repository.TrackRepository;
+import com.zhytelnyi.online_radio_server.repository.UserRepository;
 import com.zhytelnyi.online_radio_server.service.factory.PlaylistFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,6 +28,10 @@ public class DataLoader implements CommandLineRunner {
     private TrackRepository trackRepository;
     @Autowired
     private PlaylistFactory playlistFactory;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -77,6 +84,13 @@ public class DataLoader implements CommandLineRunner {
             stationRepository.save(classicRockStation);
             stationRepository.save(classicMusicStation);
             stationRepository.save(classicMusicStationLowQuality);
+
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setRole("ROLE_ADMIN");
+            userRepository.save(admin);
+
 
 
 
