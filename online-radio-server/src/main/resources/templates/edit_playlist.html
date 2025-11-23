@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редагування Плейлиста</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; }
+        button { padding: 10px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .back { margin-bottom: 20px; display: block; }
+    </style>
+</head>
+<body>
+
+<a href="/admin" class="back">← Назад в Адмінку</a>
+
+<h1>Редагування: <span th:text="${playlist.name}">Name</span></h1>
+
+<form action="/admin/playlists/update" method="post">
+    <input type="hidden" name="id" th:value="${playlist.id}">
+
+    <div class="form-group">
+        <label>Назва:</label>
+        <input type="text" name="name" th:value="${playlist.name}" required>
+    </div>
+
+    <div class="form-group">
+        <label>Треки (Затисніть Ctrl, щоб вибрати декілька):</label>
+        <select name="trackIds" multiple style="height: 300px;">
+            <option th:each="track : ${allTracks}"
+                    th:value="${track.id}"
+                    th:text="${track.artist + ' - ' + track.title}"
+                    th:selected="${playlist.tracks.contains(track)}">
+            </option>
+        </select>
+    </div>
+
+    <button type="submit">Зберегти зміни</button>
+</form>
+
+</body>
+</html>

@@ -1,12 +1,12 @@
 package com.zhytelnyi.online_radio_server.controller;
 
+import com.zhytelnyi.online_radio_server.model.Playlist;
 import com.zhytelnyi.online_radio_server.service.facade.RadioFacade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,61 +16,73 @@ public class AdminController {
 
     @Autowired private RadioFacade radioFacade;
 
-    /**
-     * Головна сторінка адмінки.
-     * Завантажуємо всі списки, щоб відобразити їх у таблицях і селектах.
-     */
     @GetMapping
-    public Mono<String> adminPage(Model model) {
-        return Mono.zip(
-                radioFacade.getAllStations(),
-                radioFacade.getAllPlaylists(),
-                radioFacade.getAllTracks()
-        ).doOnNext(tuple -> {
-            model.addAttribute("stations", tuple.getT1());
-            model.addAttribute("playlists", tuple.getT2());
-            model.addAttribute("tracks", tuple.getT3());
-        }).thenReturn("admin");
+    public String adminPage(Model model) {
+        model.addAttribute("stations", radioFacade.getAllStations());
+        model.addAttribute("playlists", radioFacade.getAllPlaylists());
+        model.addAttribute("tracks", radioFacade.getAllTracks());
+        return "admin";
     }
 
-    // --- TRACKS ---
     @PostMapping("/tracks/add")
-    public Mono<String> addTrack(@RequestPart String title,
-                                 @RequestPart String artist,
-                                 @RequestPart("file") FilePart file) {
-        return radioFacade.uploadTrack(title, artist, file)
-                .thenReturn("redirect:/admin");
+    public String addTrack(@RequestParam String title,
+                           @RequestParam String artist,
+                           @RequestParam("file") MultipartFile file) {
+        radioFacade.uploadTrack(title, artist, file);
+        return "redirect:/admin";
     }
 
     @PostMapping("/tracks/delete/{id}")
-    public Mono<String> deleteTrack(@PathVariable Long id) {
-        return radioFacade.deleteTrack(id).thenReturn("redirect:/admin");
+    public String deleteTrack(@PathVariable Long id) {
+        radioFacade.deleteTrack(id);
+
+        return "redirect:/admin";
     }
 
-    // --- PLAYLISTS ---
     @PostMapping("/playlists/add")
-    public Mono<String> addPlaylist(@RequestParam String name,
-                                    @RequestParam(required = false) List<Long> trackIds) {
-        return radioFacade.createPlaylist(name, trackIds)
-                .thenReturn("redirect:/admin");
+    public String addPlaylist(@RequestParam String name,
+                              @RequestParam(required = false) List<Long> trackIds) {
+        radioFacade.createPlaylist(name, trackIds);
+        return "redirect:/admin";
     }
 
     @PostMapping("/playlists/delete/{id}")
-    public Mono<String> deletePlaylist(@PathVariable Long id) {
-        return radioFacade.deletePlaylist(id).thenReturn("redirect:/admin");
+    public String deletePlaylist(@PathVariable Long id) {
+        radioFacade.deletePlaylist(id);
+        return "redirect:/admin";
     }
 
-    // --- STATIONS ---
     @PostMapping("/stations/add")
-    public Mono<String> addStation(@RequestParam String name,
-                                   @RequestParam int bitrate,
-                                   @RequestParam(required = false) List<Long> playlistIds) {
-        return radioFacade.createStation(name, bitrate, playlistIds)
-                .thenReturn("redirect:/admin");
+    public String addStation(@RequestParam String name,
+                             @RequestParam int bitrate,
+                             @RequestParam(required = false) List<Long> playlistIds) {
+        radioFacade.createStation(name, bitrate, playlistIds);
+        return "redirect:/admin";
     }
 
     @PostMapping("/stations/delete/{id}")
-    public Mono<String> deleteStation(@PathVariable Long id) {
-        return radioFacade.deleteStation(id).thenReturn("redirect:/admin");
+    public String deleteStation(@PathVariable Long id) {
+        radioFacade.deleteStation(id);
+        return "redirect:/admin";
+    }
+
+    @GetMapping("/playlists/edit/{id}")
+    public String editPlaylistPage(@PathVariable Long id, Model model) {
+        Playlist playlist = radioFacade.getPlaylistById(id);
+
+        model.addAttribute("playlist", playlist);
+        model.addAttribute("allTracks", radioFacade.getAllTracks());
+
+        return "edit_playlist";
+    }
+
+    @PostMapping("/playlists/update")
+    public String updatePlaylist(
+            @RequestParam Long id,
+            @RequestParam String name,
+            @RequestParam(required = false) List<Long> trackIds
+    ) {
+        radioFacade.updatePlaylist(id, name, trackIds);
+        return "redirect:/admin";
     }
 }

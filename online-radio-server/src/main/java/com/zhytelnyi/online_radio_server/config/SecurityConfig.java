@@ -2,48 +2,37 @@ package com.zhytelnyi.online_radio_server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity; // MVC
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity; // MVC
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
-import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
-
-import java.net.URI;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebFluxSecurity
+@EnableWebSecurity // <-- MVC Анотація
 public class SecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
-
-        // Налаштовуємо, куди йти після виходу
-        RedirectServerLogoutSuccessHandler logoutHandler = new RedirectServerLogoutSuccessHandler();
-        logoutHandler.setLogoutSuccessUrl(URI.create("/")); // На головну
-
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable) // Вимикаємо CSRF
-                // 1. Правила доступу
-                .authorizeExchange(auth -> auth
-                        .pathMatchers("/", "/register", "/login", "/css/**", "/js/**", "/hls/**").permitAll() // Публічне
-                        .pathMatchers("/admin/**").hasRole("ADMIN") // Тільки для адміна
-                        .anyExchange().authenticated() // Решта - тільки для залогінених
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable()) // Вимикаємо CSRF
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/register", "/login", "/hls/**", "/api/v1/stations", "/css/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
-                // 2. Налаштування форми входу
                 .formLogin(form -> form
-                                .loginPage("/login") // Наша кастомна сторінка
-                        // Якщо успішно - редірект (автоматично на ту сторінку, куди хотів, або на /)
+                        .loginPage("/login") // Ваша сторінка
+                        .defaultSuccessUrl("/", true) // Куди йти після входу
+                        .permitAll()
                 )
-                // 3. Налаштування виходу
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessHandler(logoutHandler)
-                )
-                // 4. Зберігання сесії
-                .securityContextRepository(new WebSessionServerSecurityContextRepository())
-                .build();
+                        .logoutSuccessUrl("/")
+                        .permitAll()
+                );
+
+        return http.build();
     }
 
     @Bean
