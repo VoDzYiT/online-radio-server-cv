@@ -35,19 +35,6 @@ public class ContentStatistics implements Visitor{
         playlistCount++;
     }
 
-//    public String getReport() {
-//        reportBuilder.append("----------------------------\n");
-//        reportBuilder.append("Total Playlists: ").append(playlistCount).append("\n");
-//        reportBuilder.append("Total Tracks: ").append(totalTracks).append("\n");
-//
-//        long hours = totalDurationSeconds / 3600;
-//        long minutes = (totalDurationSeconds % 3600) / 60;
-//        reportBuilder.append("Total Content Duration: ")
-//                .append(hours).append("h ").append(minutes).append("m\n");
-//
-//        return reportBuilder.toString();
-//    }
-
     public int getTotalTracks() {
         return totalTracks;
     }

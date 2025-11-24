@@ -1,4 +1,4 @@
-package com.zhytelnyi.online_radio_server.service;
+package com.zhytelnyi.online_radio_server.service.auth;
 
 import com.zhytelnyi.online_radio_server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

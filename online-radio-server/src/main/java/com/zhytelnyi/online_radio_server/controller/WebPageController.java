@@ -82,6 +82,6 @@ public class WebPageController {
 
         model.addAttribute("favoriteStations", stations);
 
-        return "favorites"; // Повертаємо назву HTML шаблону
+        return "favorites";
     }
 }
