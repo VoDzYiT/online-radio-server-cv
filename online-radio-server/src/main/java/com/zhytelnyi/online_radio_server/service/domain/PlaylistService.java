@@ -1,9 +1,12 @@
 package com.zhytelnyi.online_radio_server.service.domain;
 
 import com.zhytelnyi.online_radio_server.model.Playlist;
+import com.zhytelnyi.online_radio_server.model.Station;
 import com.zhytelnyi.online_radio_server.model.Track;
 import com.zhytelnyi.online_radio_server.repository.PlaylistRepository;
+import com.zhytelnyi.online_radio_server.repository.StationRepository;
 import com.zhytelnyi.online_radio_server.service.factory.PlaylistFactory;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -12,10 +15,12 @@ public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final PlaylistFactory playlistFactory;
+    private final StationRepository stationRepository;
 
-    public PlaylistService(PlaylistRepository playlistRepository, PlaylistFactory playlistFactory) {
+    public PlaylistService(PlaylistRepository playlistRepository, PlaylistFactory playlistFactory, StationRepository stationRepository) {
         this.playlistRepository = playlistRepository;
         this.playlistFactory = playlistFactory;
+        this.stationRepository = stationRepository;
     }
 
     public Playlist create(String name, List<Track> tracks) {
@@ -30,7 +35,6 @@ public class PlaylistService {
         playlist.setName(newName);
 
         if (newTracks != null) {
-            // Оскільки це ManyToMany з Merge, це безпечно оновить зв'язки
             playlist.setTracks(newTracks);
         } else {
             playlist.getTracks().clear();
@@ -44,5 +48,16 @@ public class PlaylistService {
 
     public List<Playlist> findAll() { return playlistRepository.findAll(); }
     public List<Playlist> findAllByIds(List<Long> ids) { return playlistRepository.findAllById(ids); }
-    public void delete(Long id) { playlistRepository.deleteById(id); }
+    @Transactional
+    public void delete(Long id) {
+        Playlist playlist = findById(id);
+        List<Station> stations = stationRepository.findAllByPlaylistsContaining(playlist);
+
+        for (Station station : stations) {
+            station.getPlaylists().remove(playlist);
+            stationRepository.save(station);
+        }
+
+        playlistRepository.deleteById(id);
+    }
 }

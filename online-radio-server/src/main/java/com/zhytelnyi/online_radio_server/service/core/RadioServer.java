@@ -13,19 +13,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service
 public class RadioServer {
 
-    @Autowired
-    private StationRepository stationRepository;
-    @Autowired
-    private AudioFileFactory audioFileFactory;
-    @Autowired
-    private ListenLogRepository listenLogRepository;
-    @Autowired
-    private HlsFileManager hlsFileManager;
+    private final StationRepository stationRepository;
+    private final AudioFileFactory audioFileFactory;
+    private final ListenLogRepository listenLogRepository;
+    private final HlsFileManager hlsFileManager;
+
+    public RadioServer(StationRepository stationRepository,
+                       AudioFileFactory audioFileFactory,
+                       ListenLogRepository listenLogRepository,
+                       HlsFileManager hlsFileManager) {
+        this.stationRepository = stationRepository;
+        this.audioFileFactory = audioFileFactory;
+        this.listenLogRepository = listenLogRepository;
+        this.hlsFileManager = hlsFileManager;
+    }
+
+    private final Map<Long, Thread> streamThreads = new ConcurrentHashMap<>();
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
@@ -39,7 +49,8 @@ public class RadioServer {
     }
 
     public void startChunking(Station station) {
-        System.out.println("Starting stream for: " + station.getName());
+        stopStreaming(station.getId());
+        System.out.println(">>> Starting stream for: " + station.getName());
 
         StreamProcessor processor = new StreamProcessor(
                 station,
@@ -49,8 +60,17 @@ public class RadioServer {
         );
 
         Thread thread = new Thread(processor);
-        thread.setName("Stream-" + station.getName());
+        thread.setName(">>> Stream-" + station.getName());
         thread.setDaemon(true);
         thread.start();
+    }
+
+    public void stopStreaming(Long stationId) {
+        Thread thread = streamThreads.get(stationId);
+        if (thread != null) {
+            System.out.println(">>> Stopping stream for station ID: " + stationId);
+            thread.interrupt();
+            streamThreads.remove(stationId);
+        }
     }
 }

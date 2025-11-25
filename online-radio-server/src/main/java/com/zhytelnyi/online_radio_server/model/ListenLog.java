@@ -11,11 +11,11 @@ public class ListenLog {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "track_id")
+    @JoinColumn(name = "track_id", nullable = true)
     private Track track;
 
     @ManyToOne
-    @JoinColumn(name = "station_id")
+    @JoinColumn(name = "station_id", nullable = true)
     private Station station;
 
     private LocalDateTime timestamp;
