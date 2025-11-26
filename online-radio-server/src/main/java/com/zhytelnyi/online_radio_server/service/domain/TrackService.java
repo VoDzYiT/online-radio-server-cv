@@ -5,7 +5,7 @@ import com.zhytelnyi.online_radio_server.model.Track;
 import com.zhytelnyi.online_radio_server.repository.ListenLogRepository;
 import com.zhytelnyi.online_radio_server.repository.PlaylistRepository;
 import com.zhytelnyi.online_radio_server.repository.TrackRepository;
-import com.zhytelnyi.online_radio_server.service.storage.FileStorageService;
+import com.zhytelnyi.online_radio_server.service.domain.FileStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
