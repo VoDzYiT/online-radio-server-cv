@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика Системи</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        h1, h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 14px; }
+        th { background: #f4f4f4; }
+        .back-link { display: inline-block; margin-bottom: 20px; text-decoration: none; font-size: 18px; }
+        .log-box { height: 300px; overflow-y: auto; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<a href="/admin" class="back-link">← Назад в Адмінку</a>
+<h1>📊 Жива Статистика</h1>
+
+<h2>Історія Ефіру</h2>
+<div class="log-box">
+    <table>
+        <tr>
+            <th>Час</th>
+            <th>Станція</th>
+            <th>Трек</th>
+        </tr>
+        <tr th:each="log : ${listenLogs}">
+            <td th:text="${#temporals.format(log.timestamp, 'dd-MM-yyyy HH:mm:ss')}">Date</td>
+            <td th:text="${log.station != null ? log.station.name : 'Deleted Station'}">Station</td>
+            <td th:text="${log.track != null ? (log.track.artist + ' - ' + log.track.title) : 'Deleted Track'}">Track</td>
+        </tr>
+    </table>
+</div>
+
+<h2>Історія Підключень Користувачів</h2>
+<div class="log-box">
+    <table>
+        <tr>
+            <th>Час</th>
+            <th>Станція</th>
+            <th>IP Адреса</th>
+            <th>Браузер</th>
+        </tr>
+        <tr th:each="log : ${connectionLogs}">
+            <td th:text="${#temporals.format(log.timestamp, 'dd-MM-yyyy HH:mm:ss')}">Date</td>
+            <td th:text="${log.station != null ? log.station.name : 'Deleted Station'}">Station</td>
+            <td th:text="${log.userIp}">127.0.0.1</td>
+            <td th:text="${log.userAgent}" style="font-size: 12px;">Mozilla...</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

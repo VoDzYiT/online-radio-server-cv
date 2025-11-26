@@ -18,7 +18,15 @@ public class ListenLog {
     @JoinColumn(name = "station_id", nullable = true)
     private Station station;
 
-    private LocalDateTime timestamp;
+    public LocalDateTime timestamp;
+
+    public Track getTrack() {
+        return track;
+    }
+
+    public Station getStation() {
+        return station;
+    }
 
     public ListenLog(Track track, Station station) {
         this.track = track;

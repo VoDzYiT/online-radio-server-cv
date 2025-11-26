@@ -85,4 +85,11 @@ public class AdminController {
         radioFacade.updatePlaylist(id, name, trackIds);
         return "redirect:/admin";
     }
+
+    @GetMapping("/statistics")
+    public String statisticsPage(Model model) {
+        model.addAttribute("listenLogs", radioFacade.getRecentListenLogs());
+        model.addAttribute("connectionLogs", radioFacade.getRecentConnectionLogs());
+        return "admin_statistics";
+    }
 }

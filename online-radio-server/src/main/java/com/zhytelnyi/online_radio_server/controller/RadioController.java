@@ -1,9 +1,11 @@
 package com.zhytelnyi.online_radio_server.controller;
 
+import com.zhytelnyi.online_radio_server.model.ConnectionLog;
 import com.zhytelnyi.online_radio_server.model.Station;
 import com.zhytelnyi.online_radio_server.repository.ConnectionLogRepository;
 import com.zhytelnyi.online_radio_server.repository.StationRepository;
 import com.zhytelnyi.online_radio_server.service.facade.RadioFacade;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -37,9 +39,24 @@ public class RadioController {
     }
 
     @GetMapping("/hls/{stationId}/stream.m3u8")
-    public ResponseEntity<Resource> getHlsManifest(@PathVariable String stationId) {
+    public ResponseEntity<Resource> getHlsManifest(@PathVariable String stationId, HttpServletRequest request) {
         Path path = Paths.get(System.getProperty("user.home"), "radio-hls-static", "hls", stationId, "stream.m3u8");
         Resource resource = new FileSystemResource(path);
+
+        try {
+            Station station = stationRepository.findById(Long.parseLong(stationId)).orElse(null);
+
+            if (station != null) {
+                String ip = request.getRemoteAddr(); // IP адреса
+                String userAgent = request.getHeader("User-Agent"); // Браузер
+
+                ConnectionLog log = new ConnectionLog(station, ip, userAgent);
+                connectionLogRepository.save(log);
+
+            }
+        } catch (Exception e) {
+            System.err.println("Stats error: " + e.getMessage());
+        }
 
         if (!resource.exists()) {
             return ResponseEntity.notFound().build();
@@ -56,7 +73,6 @@ public class RadioController {
             @RequestParam Long stationId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        // Перевірка авторизації
         if (userDetails == null) {
             return ResponseEntity.status(401).body("You must contain login first");
         }

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface ListenLogRepository extends JpaRepository<ListenLog, Long> {
     @Modifying
     @Transactional
@@ -16,4 +18,6 @@ public interface ListenLogRepository extends JpaRepository<ListenLog, Long> {
     @Transactional
     @Query("UPDATE ListenLog l SET l.station = NULL WHERE l.station.id = :stationId")
     void detachStationFromLogs(Long stationId);
+
+    List<ListenLog> findTop50ByOrderByTimestampDesc();
 }

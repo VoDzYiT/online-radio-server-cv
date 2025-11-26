@@ -16,7 +16,7 @@ public class ConnectionLog {
 
     private String userIp;
     private String userAgent;
-    private LocalDateTime timestamp;
+    public LocalDateTime timestamp;
 
     public ConnectionLog(Station station, String userIp, String userAgent) {
         this.station = station;
@@ -26,5 +26,17 @@ public class ConnectionLog {
     }
 
     public ConnectionLog() {}
+
+    public String getUserIp() {
+        return userIp;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public Station getStation() {
+        return station;
+    }
 
 }

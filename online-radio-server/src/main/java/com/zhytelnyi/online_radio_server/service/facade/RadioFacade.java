@@ -1,6 +1,8 @@
 package com.zhytelnyi.online_radio_server.service.facade;
 
 import com.zhytelnyi.online_radio_server.model.*;
+import com.zhytelnyi.online_radio_server.repository.ConnectionLogRepository;
+import com.zhytelnyi.online_radio_server.repository.ListenLogRepository;
 import com.zhytelnyi.online_radio_server.service.core.RadioServer;
 import com.zhytelnyi.online_radio_server.service.domain.*; // Імпортуємо наші нові сервіси
 import com.zhytelnyi.online_radio_server.service.adapter.IReportExporter;
@@ -20,19 +22,23 @@ public class RadioFacade {
     private final UserService userService;
     private final RadioServer radioServer;
     private final IReportExporter reportExporter;
+    private final ListenLogRepository listenLogRepository;
+    private final ConnectionLogRepository connectionLogRepository;
 
     public RadioFacade(TrackService trackService,
                        PlaylistService playlistService,
                        StationService stationService,
                        UserService userService,
                        RadioServer radioServer,
-                       @Qualifier("jsonExporter") IReportExporter reportExporter) {
+                       @Qualifier("jsonExporter") IReportExporter reportExporter, ListenLogRepository listenLogRepository, ConnectionLogRepository connectionLogRepository) {
         this.trackService = trackService;
         this.playlistService = playlistService;
         this.stationService = stationService;
         this.userService = userService;
         this.radioServer = radioServer;
         this.reportExporter = reportExporter;
+        this.listenLogRepository = listenLogRepository;
+        this.connectionLogRepository = connectionLogRepository;
     }
 
     // === TRACKS ===
@@ -100,4 +106,14 @@ public class RadioFacade {
     public List<Station> getUserFavoriteStations(String username) {
         return userService.getFavorites(username);
     }
+
+    // === STATISTICS ===
+    public List<ListenLog> getRecentListenLogs() {
+        return listenLogRepository.findTop50ByOrderByTimestampDesc();
+    }
+
+    public List<ConnectionLog> getRecentConnectionLogs() {
+        return connectionLogRepository.findTop50ByOrderByTimestampDesc();
+    }
+
 }
