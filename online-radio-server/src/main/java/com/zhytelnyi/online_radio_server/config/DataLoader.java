@@ -40,9 +40,9 @@ public class DataLoader implements CommandLineRunner {
         if (stationRepository.count() == 0) {
             System.out.println("The database is empty. Loading test data...");
 
-            Track track1 = new Track("Music1", "Pixabay", "src/main/resources/music/music1.mp3", 111);
-            Track track2 = new Track("Music2", "Pixabay", "src/main/resources/music/music2.mp3", 24);
-            Track track3 = new Track("Music3", "Pixabay", "src/main/resources/music/music3.mp3", 39);
+            Track track1 = new Track("Music1", "Pixabay", "online-radio-server/src/main/resources/music/music1.mp3", 111);
+            Track track2 = new Track("Music2", "Pixabay", "online-radio-server/src/main/resources/music/music2.mp3", 24);
+            Track track3 = new Track("Music3", "Pixabay", "online-radio-server/src/main/resources/music/music3.mp3", 39);
 
 
 
