@@ -117,9 +117,9 @@
     </form>
 
     <table>
-        <tr><th>ID</th><th>Назва</th><th>Бітрейт</th><th>Дія</th></tr>
+        <tr><th>ID</th><th>Назва</th><th>Бітрейт</th><th>Дія</th><th>Генерувати звіт</th></tr>
         <tr th:each="st : ${stations}">
-            <td th:text="${st.id}">1</td>
+        <td th:text="${st.id}">1</td>
             <td th:text="${st.name}">My Radio</td>
             <td th:text="${st.bitrate}">128</td>
             <td>
@@ -127,9 +127,17 @@
                     <button type="submit" class="btn-delete">Видалити</button>
                 </form>
             </td>
+            <td>
+                <a th:href="@{/api/v1/station/{id}/report(id=${st.id})}" target="_blank"
+                   style="background: #17a2b8; color: white; padding: 5px; text-decoration: none; border-radius: 4px; margin-right: 5px;">
+                    Звіт
+                </a>
+            </td>
         </tr>
     </table>
+
 </div>
+
 
 </body>
 </html>

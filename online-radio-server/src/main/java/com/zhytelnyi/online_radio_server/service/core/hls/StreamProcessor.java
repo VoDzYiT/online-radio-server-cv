@@ -22,6 +22,7 @@ public class StreamProcessor implements Runnable {
 
     private static final int CHUNK_DURATION = 5;
     private static final int LIST_SIZE = 3;
+    private int chunkCounter = 0;
 
     public StreamProcessor(Station station,
                            HlsFileManager fileManager,
@@ -38,7 +39,6 @@ public class StreamProcessor implements Runnable {
         try {
             Path stationPath = fileManager.prepareStationDirectory(station.getId());
 
-            int chunkCounter = 0;
             LinkedList<String> manifestChunks = new LinkedList<>();
             TrackIterator trackIterator = station.getPlaylists().get(0).createIterator();
 
@@ -54,7 +54,7 @@ public class StreamProcessor implements Runnable {
                     continue;
                 }
 
-                processTrackFile(trackFile, stationPath, chunkCounter, manifestChunks);
+                processTrackFile(trackFile, stationPath, manifestChunks);
 
             }
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class StreamProcessor implements Runnable {
         }
     }
 
-    private void processTrackFile(File file, Path stationPath, int globalCounter, LinkedList<String> chunks) throws Exception {
+    private void processTrackFile(File file, Path stationPath, LinkedList<String> chunks) throws Exception {
         Mp3File mp3 = new Mp3File(file);
         long dataOffset = mp3.hasId3v2Tag() ? mp3.getId3v2Tag().getLength() : 0;
         long dataLength = file.length() - dataOffset;
@@ -74,7 +74,7 @@ public class StreamProcessor implements Runnable {
             long totalBytesRead = 0;
 
             while (totalBytesRead < dataLength) {
-                String chunkName = String.format("chunk-%05d.mp3", globalCounter++); // Використовуємо поле класу
+                String chunkName = String.format("chunk-%05d.mp3", chunkCounter++);
                 Path chunkPath = stationPath.resolve(chunkName);
 
                 long bytesToRead = Math.min(chunkByteSize, dataLength - totalBytesRead);
@@ -90,7 +90,7 @@ public class StreamProcessor implements Runnable {
                     fileManager.deleteOldChunk(stationPath, chunks.removeFirst());
                 }
 
-                fileManager.updateManifest(stationPath, globalCounter, chunks, CHUNK_DURATION);
+                fileManager.updateManifest(stationPath, chunkCounter, chunks, CHUNK_DURATION);
 
                 totalBytesRead += read;
                 Thread.sleep(CHUNK_DURATION * 1000);

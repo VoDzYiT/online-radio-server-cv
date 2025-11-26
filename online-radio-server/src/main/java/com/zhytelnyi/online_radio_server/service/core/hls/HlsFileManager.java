@@ -43,6 +43,7 @@ public class HlsFileManager {
             writer.println("#EXT-X-TARGETDURATION:" + (duration + 1));
             writer.println("#EXT-X-MEDIA-SEQUENCE:" + Math.max(0, sequence - chunks.size()));
 
+
             for (String chunkName : chunks) {
                 writer.println("#EXTINF:" + duration + ".000,");
                 writer.println(chunkName);

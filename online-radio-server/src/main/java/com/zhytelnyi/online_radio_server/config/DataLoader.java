@@ -40,50 +40,38 @@ public class DataLoader implements CommandLineRunner {
         if (stationRepository.count() == 0) {
             System.out.println("The database is empty. Loading test data...");
 
-            // Треки
-            Track track1 = new Track("Bohemian Rhapsody", "Queen", "online-radio-server/src/main/resources/music/Queen-Bohemian-Rhaopsody-Clean-V.mp3", 21);
-            Track track2 = new Track("Hotel California", "The eagles", "online-radio-server/src/main/resources/music/hotel_california.mp3", 18);
-            Track track3 = new Track("Thunderstruck", "AC/DC", "online-radio-server/src/main/resources/music/thunderstruck.mp3", 19);
-
-            Track track4 = new Track("Fur Elise", "Beethoven", "online-radio-server/src/main/resources/music/fur-elise-and-orchestra-110149.mp3", 21);
-            Track track5 = new Track("Symphony No. 40", "Mozart", "online-radio-server/src/main/resources/music/SymphonyNo40InGMinor.mp3", 19);
-
-            trackRepository.saveAll(List.of(track1, track2, track3, track4, track5));
-
-            // Плейлисти
-            Playlist rockPlaylist = playlistFactory.createPlaylist("Classic Rock");
-            rockPlaylist.addTrack(track1);
-            rockPlaylist.addTrack(track2);
-            rockPlaylist.addTrack(track3);
-
-            Playlist classicPlaylist = playlistFactory.createPlaylist("Classic Music");
-            classicPlaylist.addTrack(track4);
-            classicPlaylist.addTrack(track5);
-
-            Playlist classicPlaylistLowQuality = playlistFactory.createPlaylist("Classic Music Low Quality");
-            classicPlaylistLowQuality.addTrack(track4);
-            classicPlaylistLowQuality.addTrack(track5);
+            Track track1 = new Track("Music1", "Pixabay", "online-radio-server/src/main/resources/music/music1.mp3", 111);
+            Track track2 = new Track("Music2", "Pixabay", "online-radio-server/src/main/resources/music/music2.mp3", 24);
+            Track track3 = new Track("Music3", "Pixabay", "online-radio-server/src/main/resources/music/music3.mp3", 39);
 
 
-            Station classicRockStation = new Station();
-            classicRockStation.setName("Classic Rock Radio");
-            classicRockStation.setPlaylists(List.of(rockPlaylist));
-            classicRockStation.setBitrate(128);
 
-            Station classicMusicStation = new Station();
-            classicMusicStation.setName("Classic Music Radio");
-            classicMusicStation.setPlaylists(List.of(classicPlaylist));
-            classicMusicStation.setBitrate(128);
+            trackRepository.saveAll(List.of(track1, track2, track3));
 
-            Station classicMusicStationLowQuality = new Station();
-            classicMusicStationLowQuality.setName("Classic Music Radio low quality");
-            classicMusicStationLowQuality.setPlaylists(List.of(classicPlaylistLowQuality));
-            classicMusicStationLowQuality.setBitrate(64);
+            Playlist music1_2playlist = playlistFactory.createPlaylist("Music1_2 Playlist");
+            music1_2playlist.addTrack(track1);
+            music1_2playlist.addTrack(track2);
 
 
-            stationRepository.save(classicRockStation);
-            stationRepository.save(classicMusicStation);
-            stationRepository.save(classicMusicStationLowQuality);
+            Playlist music3playlist = playlistFactory.createPlaylist("Music3 Playlist");
+            music3playlist.addTrack(track3);
+
+
+            Station music1_2station = new Station();
+            music1_2station.setName("Station For music 1 2");
+            music1_2station.setPlaylists(List.of(music1_2playlist));
+            music1_2station.setBitrate(224);
+
+            Station musci3station = new Station();
+            musci3station.setName("64b Station For music 3");
+            musci3station.setPlaylists(List.of(music3playlist));
+            musci3station.setBitrate(64);
+
+
+
+
+            stationRepository.save(music1_2station);
+            stationRepository.save(musci3station);
 
             User admin = new User();
             admin.setUsername("admin");
