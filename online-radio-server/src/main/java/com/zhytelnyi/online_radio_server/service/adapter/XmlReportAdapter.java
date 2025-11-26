@@ -8,11 +8,9 @@ import org.springframework.stereotype.Component;
 public class XmlReportAdapter implements IReportExporter{
     @Override
     public String export(Station station) {
-        // 1. Збираємо дані (так само, як і в JSON адаптері)
         ContentStatistics visitor = new ContentStatistics();
         station.accept(visitor);
 
-        // 2. АДАПТУЄМО дані у формат XML
         return String.format(
                 "<StationReport>\n" +
                         "  <Name>%s</Name>\n" +

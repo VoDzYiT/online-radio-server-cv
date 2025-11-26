@@ -24,10 +24,13 @@ public class StationService {
     }
 
     public Station create(String name, int bitrate, List<Playlist> playlists) {
+        if (playlists == null || playlists.isEmpty()) {
+            throw new IllegalArgumentException(">>> Error: Station must have at least one playlist");
+        }
         Station station = new Station();
         station.setName(name);
         station.setBitrate(bitrate);
-        if (playlists != null) station.setPlaylists(playlists);
+        station.setPlaylists(playlists);
         return stationRepository.save(station);
     }
 
@@ -38,5 +41,9 @@ public class StationService {
         favoriteRepository.deleteAllByStationId(id);
         listenLogRepository.detachStationFromLogs(id);
         stationRepository.deleteById(id);
+    }
+
+    public List<Station> findAllByPlaylist(Playlist playlist) {
+        return stationRepository.findAllByPlaylistsContaining(playlist);
     }
 }

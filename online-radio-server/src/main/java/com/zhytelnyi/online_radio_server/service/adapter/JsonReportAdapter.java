@@ -13,7 +13,6 @@ public class JsonReportAdapter implements IReportExporter {
         ContentStatistics visitor = new ContentStatistics();
         station.accept(visitor);
 
-        // 2. Отримуємо сирі дані
         String name = visitor.getStationName();
         int tracks = visitor.getTotalTracks();
         int playlists = visitor.getPlaylistCount();

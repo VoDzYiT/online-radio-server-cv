@@ -55,7 +55,6 @@ public class HlsFileManager {
         try {
             Files.deleteIfExists(stationPath.resolve(chunkName));
         } catch (IOException e) {
-            // Log warning
         }
     }
 }

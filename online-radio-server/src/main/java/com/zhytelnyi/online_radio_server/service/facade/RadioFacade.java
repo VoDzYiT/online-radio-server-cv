@@ -51,6 +51,17 @@ public class RadioFacade {
     public void updatePlaylist(Long id, String newName, List<Long> trackIds) {
         List<Track> tracks = (trackIds != null) ? trackService.findAllByIds(trackIds) : null;
         playlistService.update(id, newName, tracks);
+
+        Playlist updatedPlaylist = playlistService.findById(id);
+        List<Station> affectedStations = stationService.findAllByPlaylist(updatedPlaylist);
+
+        for (Station station : affectedStations) {
+            try {
+                radioServer.restartChunking(station);
+            } catch (Exception e) {
+                System.err.println("Failed to restart stream for station " + station.getName());
+            }
+        }
     }
     public Playlist getPlaylistById(Long id) { return playlistService.findById(id); }
     public List<Playlist> getAllPlaylists() { return playlistService.findAll(); }

@@ -18,7 +18,6 @@ public class UserService {
     private final FavoriteRepository favoriteRepository;
     private final StationRepository stationRepository;
 
-    // Constructor Injection
     public UserService(UserRepository userRepository,
                        FavoriteRepository favoriteRepository,
                        StationRepository stationRepository) {
@@ -47,11 +46,9 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        // Отримуємо записи Favorite і витягуємо з них Station
         return favoriteRepository.findAllByUser(user).stream()
                 .map(Favorite::getStation)
                 .collect(Collectors.toList());
     }
 
-    // Тут також можна додати методи для зміни пароля, оновлення профілю тощо.
 }

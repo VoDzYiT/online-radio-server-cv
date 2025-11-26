@@ -64,10 +64,6 @@ public class Playlist implements TrackCollection, Element {
         track.getPlaylists().add(this);
     }
 
-    public void removeTrack(Track track) {
-        this.tracks.add(track);
-        track.getPlaylists().add(this);
-    }
 
     @Override
     @Transient

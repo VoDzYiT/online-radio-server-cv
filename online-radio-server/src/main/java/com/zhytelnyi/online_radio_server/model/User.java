@@ -28,8 +28,7 @@ public class User implements Element, UserDetails {
     @OneToMany(mappedBy = "user")
     private Set<Favorite> favorites;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Recording> recording;
+
 
     public User() {}
     public User(String username, String password, String role) {
@@ -46,7 +45,6 @@ public class User implements Element, UserDetails {
     @Override public String getPassword() { return password; }
     @Override public String getUsername() { return username; }
 
-    // Для простоти все true
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
@@ -85,13 +83,6 @@ public class User implements Element, UserDetails {
         this.favorites = favorites;
     }
 
-    public Set<Recording> getRecording() {
-        return recording;
-    }
-
-    public void setRecording(Set<Recording> recording) {
-        this.recording = recording;
-    }
 
     @Override
     public void accept(Visitor visitor) {

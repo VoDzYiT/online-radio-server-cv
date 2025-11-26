@@ -63,7 +63,6 @@
     var select = document.getElementById('station-select');
     var hls = null;
 
-    // --- 1. Функція додавання в улюблені ---
     function addToFavorites() {
         var stationId = select.value;
         fetch('/api/v1/favorites?stationId=' + stationId, { method: 'POST' })
@@ -80,7 +79,6 @@
             .catch(err => console.error(err));
     }
 
-    // --- 2. Логіка завантаження станції (HLS) ---
     function loadStation(stationId) {
         var hlsUrl = '/hls/' + stationId + '/stream.m3u8';
 
@@ -104,34 +102,26 @@
         }
     }
 
-    // Обробка ручного перемикання станції
     select.addEventListener('change', function() {
         loadStation(this.value);
     });
 
-    // --- 3. Обробка старту сторінки (оновлено) ---
     window.onload = function() {
-        // Перевіряємо, чи є параметр ?play=ID в URL
         const urlParams = new URLSearchParams(window.location.search);
         const playId = urlParams.get('play');
 
         if (playId) {
-            // Перевіряємо, чи існує така опція в select (щоб уникнути помилок)
             let optionExists = [...select.options].some(o => o.value == playId);
 
             if (optionExists) {
                 select.value = playId;
                 loadStation(playId);
 
-                // Очищуємо URL (прибираємо ?play=...), щоб було красиво
-                // Використовуємо window.location.pathname, щоб залишити чистий шлях
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else {
-                // Якщо ID з URL невірний, граємо стандартну
                 if(select.value) loadStation(select.value);
             }
         } else {
-            // Якщо немає параметра, граємо першу зі списку
             if(select.value) loadStation(select.value);
         }
     };

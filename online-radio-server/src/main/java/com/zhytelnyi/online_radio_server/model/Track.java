@@ -56,33 +56,21 @@ public class Track implements Element {
         return artist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
 
     public String getFilePath() {
         return filePath;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
 
     public Set<Playlist> getPlaylists() {
         return playlists;
     }
 
-    public void setPlaylists(Set<Playlist> playlists) {
-        this.playlists = playlists;
-    }
 
     public int getDurationInSeconds() {
         return durationInSeconds;
     }
 
-    public void setDurationInSeconds(int durationInSeconds) {
-        this.durationInSeconds = durationInSeconds;
-    }
 
     public void accept(Visitor visitor) {
         visitor.visit(this);

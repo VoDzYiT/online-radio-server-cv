@@ -17,13 +17,13 @@ public class AudioFileFactory {
             return bitrateFile;
         }
 
-        System.out.println("Factory: Bitrate file not found: " + basePath);
+        System.out.println(">>> Factory: Bitrate file not found: " + basePath);
         File defaultFile = new File(basePath);
         if (defaultFile.exists() && defaultFile.canRead()) {
             return defaultFile;
         }
 
-        System.err.println("Factory: No files found for track: " + basePath);
+        System.err.println(">>> Factory: No files found for track: " + basePath);
         return null;
     }
 }

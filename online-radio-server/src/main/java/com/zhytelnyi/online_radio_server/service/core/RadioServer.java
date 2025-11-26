@@ -63,6 +63,8 @@ public class RadioServer {
         thread.setName(">>> Stream-" + station.getName());
         thread.setDaemon(true);
         thread.start();
+
+        streamThreads.put(station.getId(), thread);
     }
 
     public void stopStreaming(Long stationId) {
@@ -72,5 +74,13 @@ public class RadioServer {
             thread.interrupt();
             streamThreads.remove(stationId);
         }
+    }
+
+    public void restartChunking(Station station) {
+        System.out.println(">>> Restarting stream for updated station: " + station.getName());
+
+        stopStreaming(station.getId());
+
+        startChunking(station);
     }
 }
